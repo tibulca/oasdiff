@@ -17,6 +17,15 @@ func GetHTMLReportAsString(d *diff.Diff) (string, error) {
 	return markdownToHTML(GetTextReportAsBytes(d))
 }
 
+// GetHTMLReportAsBytes returns an HTML diff report as a byte slice
+func GetHTMLReportAsBytes(d *diff.Diff) ([]byte, error) {
+	report, err := GetHTMLReportAsString(d)
+	if err != nil {
+		return nil, err
+	}
+	return []byte(report), nil
+}
+
 func markdownToHTML(source []byte) (string, error) {
 	md := goldmark.New(
 		goldmark.WithExtensions(extension.GFM),

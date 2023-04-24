@@ -19,6 +19,15 @@ func GetChecks(includeChecks utils.StringList) BackwardCompatibilityCheckConfig 
 	}
 }
 
+func GetAllChecks() BackwardCompatibilityCheckConfig {
+	return BackwardCompatibilityCheckConfig{
+		Checks:              allChecks(),
+		MinSunsetBetaDays:   31,
+		MinSunsetStableDays: 180,
+		Localizer:           *localizations.New("en", "en"),
+	}
+}
+
 var optionalChecks = map[string]BackwardCompatibilityCheck{
 	"response-non-success-status-removed":   ResponseNonSuccessStatusRemoved,
 	"api-operation-id-removed":              APIOperationIdRemovedCheck,
@@ -107,4 +116,16 @@ func defaultChecks() []BackwardCompatibilityCheck {
 		ResponsePropertyMinDecreasedCheck,
 		RequestParameterDefaultValueChanged,
 	}
+}
+
+func allChecks() []BackwardCompatibilityCheck {
+	return append(defaultChecks(), []BackwardCompatibilityCheck{
+		ResponseNonSuccessStatusRemoved,
+		APIOperationIdRemovedCheck,
+		APITagRemovedCheck,
+		ResponseParameterEnumValueRemovedCheck,
+		ResponseMediaTypeEnumValueRemovedCheck,
+		RequestBodyEnumValueRemovedCheck,
+		APIAddedCheck,
+	}...)
 }

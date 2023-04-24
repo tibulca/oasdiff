@@ -9,6 +9,7 @@ request-property-pattern-added: добавлен pattern '%s' у поля зап
 request-property-pattern-changed: изменён pattern у поля запроса %s со значения '%s' на значение '%s'
 api-deprecated-sunset-parse: API deprecated без валидно парсящейся даты sunset 
 api-sunset-date-too-small: дата API sunset date %s слишком ранняя, должно быть как минимум %d дней от текущего дня
+api-path-added: API path добавлено
 api-path-removed-without-deprecation: api path удалён без процедуры deprecation
 api-path-removed-before-sunset: API path удалён до даты sunset %s
 api-removed-without-deprecation: API удалён без deprecation

@@ -17,6 +17,7 @@ import (
 const (
 	ERR  = 0
 	WARN = 1
+	INFO = 2
 )
 
 const (

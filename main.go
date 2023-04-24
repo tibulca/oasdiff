@@ -1,11 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
-	"reflect"
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/tufin/oasdiff/build"
@@ -13,23 +11,15 @@ import (
 	"github.com/tufin/oasdiff/checker/localizations"
 	"github.com/tufin/oasdiff/diff"
 	"github.com/tufin/oasdiff/load"
-	"github.com/tufin/oasdiff/report"
+	"github.com/tufin/oasdiff/output"
 	"github.com/tufin/oasdiff/utils"
-	"gopkg.in/yaml.v3"
 )
 
-var base, revision, filter, filterExtension, format, lang, warnIgnoreFile, errIgnoreFile string
+var base, revision, filter, filterExtension, profile, format, lang, warnIgnoreFile, errIgnoreFile string
 var prefix_base, prefix_revision, strip_prefix_base, strip_prefix_revision, prefix string
 var excludeExamples, excludeDescription, summary, breakingOnly, failOnDiff, failOnWarns, version, composed, checkBreaking, excludeEndpoints bool
 var deprecationDays int
 var includeChecks, excludeElements utils.StringList
-
-const (
-	formatYAML = "yaml"
-	formatJSON = "json"
-	formatText = "text"
-	formatHTML = "html"
-)
 
 func init() {
 	flag.StringVar(&base, "base", "", "path or URL (or a glob in Composed mode) of original OpenAPI spec in YAML or JSON format")
@@ -50,7 +40,8 @@ func init() {
 	flag.StringVar(&warnIgnoreFile, "warn-ignore", "", "the configuration file for ignoring warnings with '-check-breaking'")
 	flag.StringVar(&errIgnoreFile, "err-ignore", "", "the configuration file for ignoring errors with '-check-breaking'")
 	flag.IntVar(&deprecationDays, "deprecation-days", 0, "minimal number of days required between deprecating a resource and removing it without being considered 'breaking'")
-	flag.StringVar(&format, "format", formatYAML, "output format: yaml, json, text or html")
+	flag.StringVar(&profile, "profile", string(output.DefaultProfile), "output profile: default, changelog")
+	flag.StringVar(&format, "format", string(output.YAML), "output format: yaml, json, text or html")
 	flag.StringVar(&lang, "lang", "en", "language for localized breaking changes checks errors")
 	flag.BoolVar(&failOnDiff, "fail-on-diff", false, "exit with return code 1 when any ERR-level breaking changes are found, used together with '-check-breaking'")
 	flag.BoolVar(&failOnWarns, "fail-on-warns", false, "exit with return code 1 when any WARN-level breaking changes are found, used together with '-check-breaking' and '-fail-on-diff'")
@@ -204,13 +195,16 @@ func main() {
 		}
 		countWarns := 0
 
-		if format == formatJSON {
-			if err = printJSON(errs); err != nil {
+		if format == string(output.JSON) {
+			formattedOutput, err := output.ToJSON(errs)
+			if err != nil {
 				fmt.Fprintf(os.Stderr, "failed to print diff JSON with %v\n", err)
 				os.Exit(106)
 			}
-			for _, bcerr := range errs {
-				if bcerr.Level == checker.WARN {
+			fmt.Printf("%s\n", formattedOutput)
+
+			for _, bcErr := range errs {
+				if bcErr.Level == checker.WARN {
 					countWarns++
 				}
 			}
@@ -220,11 +214,11 @@ func main() {
 				fmt.Printf(c.Localizer.Get("messages.total-errors"), len(errs))
 			}
 
-			for _, bcerr := range errs {
-				if bcerr.Level == checker.WARN {
+			for _, bcErr := range errs {
+				if bcErr.Level == checker.WARN {
 					countWarns++
 				}
-				fmt.Printf("%s\n\n", bcerr.PrettyErrorText(c.Localizer))
+				fmt.Printf("%s\n\n", bcErr.PrettyErrorText(c.Localizer))
 			}
 		}
 
@@ -238,37 +232,15 @@ func main() {
 	}
 
 	if summary {
-		if err = printYAML(diffReport.GetSummary()); err != nil {
-			fmt.Fprintf(os.Stderr, "failed to print summary with %v\n", err)
-			os.Exit(105)
-		}
-		exitNormally(diffReport.Empty())
+		profile = string(output.SummaryProfile)
 	}
 
-	switch {
-	case format == formatYAML:
-		if err = printYAML(diffReport); err != nil {
-			fmt.Fprintf(os.Stderr, "failed to print diff YAML with %v\n", err)
-			os.Exit(106)
-		}
-	case format == formatJSON:
-		if err = printJSON(diffReport); err != nil {
-			fmt.Fprintf(os.Stderr, "failed to print diff JSON with %v\n", err)
-			os.Exit(106)
-		}
-	case format == formatText:
-		fmt.Printf("%s", report.GetTextReportAsString(diffReport))
-	case format == formatHTML:
-		html, err := report.GetHTMLReportAsString(diffReport)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "failed to generate HTML diff report with %v\n", err)
-			os.Exit(107)
-		}
-		fmt.Printf("%s", html)
-	default:
-		fmt.Fprintf(os.Stderr, "unknown output format %q\n", format)
-		os.Exit(108)
+	diffOutput, errCode, err := output.Format(format, profile, diffReport, operationsSources)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+		os.Exit(errCode)
 	}
+	fmt.Printf("%s\n", diffOutput)
 
 	exitNormally(diffReport.Empty())
 }
@@ -278,30 +250,4 @@ func exitNormally(diffEmpty bool) {
 		os.Exit(1)
 	}
 	os.Exit(0)
-}
-
-func printYAML(output interface{}) error {
-	if reflect.ValueOf(output).IsNil() {
-		return nil
-	}
-
-	bytes, err := yaml.Marshal(output)
-	if err != nil {
-		return err
-	}
-	fmt.Printf("%s", bytes)
-	return nil
-}
-
-func printJSON(output interface{}) error {
-	if reflect.ValueOf(output).IsNil() {
-		return nil
-	}
-
-	bytes, err := json.MarshalIndent(output, "", "  ")
-	if err != nil {
-		return err
-	}
-	fmt.Printf("%s\n", bytes)
-	return nil
 }
