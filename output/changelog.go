@@ -76,7 +76,7 @@ func checkModifiedPaths(diffReport *diff.Diff, checks checker.BackwardCompatibil
 func check(dr *diff.Diff, checks checker.BackwardCompatibilityCheckConfig, operationsSources *diff.OperationsSourcesMap) checker.BackwardCompatibilityErrors {
 	pathErrs := checker.CheckBackwardCompatibility(checks, dr, operationsSources)
 	if pathErrs.Len() == 0 {
-		s, _ := ToJSON(dr)
+		s, _ := ToYAML(dr)
 		fmt.Printf("no oasdiff checker matched:\n%s", s)
 		os.Exit(missingCheckerErrCode)
 	}

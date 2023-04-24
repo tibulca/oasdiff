@@ -127,5 +127,6 @@ func allChecks() []BackwardCompatibilityCheck {
 		ResponseMediaTypeEnumValueRemovedCheck,
 		RequestBodyEnumValueRemovedCheck,
 		APIAddedCheck,
+		APIDeprecatedCheck,
 	}...)
 }
