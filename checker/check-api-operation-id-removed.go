@@ -10,8 +10,8 @@ const (
 	apiOperationRemovedCheckId = "api-operation-id-removed"
 )
 
-func APIOperationIdRemovedCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []BackwardCompatibilityError {
-	result := make([]BackwardCompatibilityError, 0)
+func APIOperationIdRemovedCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []CheckResult {
+	result := make([]CheckResult, 0)
 	if diffReport.PathsDiff == nil {
 		return result
 	}
@@ -29,7 +29,7 @@ func APIOperationIdRemovedCheck(diffReport *diff.Diff, operationsSources *diff.O
 				continue
 			}
 
-			result = append(result, BackwardCompatibilityError{
+			result = append(result, CheckResult{
 				Id:          apiOperationRemovedCheckId,
 				Level:       ERR,
 				Text:        fmt.Sprintf(config.i18n(apiOperationRemovedCheckId), ColorizedValue(operationItem.Base.OperationID), ColorizedValue(operationItem.Revision.OperationID)),

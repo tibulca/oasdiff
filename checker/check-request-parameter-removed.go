@@ -6,8 +6,8 @@ import (
 	"github.com/tufin/oasdiff/diff"
 )
 
-func RequestParameterRemovedCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []BackwardCompatibilityError {
-	result := make([]BackwardCompatibilityError, 0)
+func RequestParameterRemovedCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []CheckResult {
+	result := make([]CheckResult, 0)
 	if diffReport.PathsDiff == nil {
 		return result
 	}
@@ -22,7 +22,7 @@ func RequestParameterRemovedCheck(diffReport *diff.Diff, operationsSources *diff
 			for paramLocation, paramItems := range operationItem.ParametersDiff.Deleted {
 				for _, paramName := range paramItems {
 					source := (*operationsSources)[operationItem.Revision]
-					result = append(result, BackwardCompatibilityError{
+					result = append(result, CheckResult{
 						Id:          "request-parameter-removed",
 						Level:       WARN,
 						Text:        fmt.Sprintf(config.i18n("request-parameter-removed"), ColorizedValue(paramLocation), ColorizedValue(paramName)),

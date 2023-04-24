@@ -6,8 +6,8 @@ import (
 	"github.com/tufin/oasdiff/diff"
 )
 
-func ResponsePropertyTypeChangedCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []BackwardCompatibilityError {
-	result := make([]BackwardCompatibilityError, 0)
+func ResponsePropertyTypeChangedCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []CheckResult {
+	result := make([]CheckResult, 0)
 	if diffReport.PathsDiff == nil {
 		return result
 	}
@@ -35,7 +35,7 @@ func ResponsePropertyTypeChangedCheck(diffReport *diff.Diff, operationsSources *
 						formatDiff := schemaDiff.FormatDiff
 						if breakingTypeFormatChangedInResponseProperty(typeDiff, formatDiff, mediaType, schemaDiff) {
 							typeDiff, formatDiff = fillEmptyTypeAndFormatDiffs(typeDiff, schemaDiff, formatDiff)
-							result = append(result, BackwardCompatibilityError{
+							result = append(result, CheckResult{
 								Id:          "response-body-type-changed",
 								Level:       ERR,
 								Text:        fmt.Sprintf(config.i18n("response-body-type-changed"), empty2none(typeDiff.From), empty2none(formatDiff.From), empty2none(typeDiff.To), empty2none(formatDiff.To), ColorizedValue(responseStatus)),
@@ -59,7 +59,7 @@ func ResponsePropertyTypeChangedCheck(diffReport *diff.Diff, operationsSources *
 
 							if breakingTypeFormatChangedInResponseProperty(typeDiff, formatDiff, mediaType, schemaDiff) {
 								typeDiff, formatDiff = fillEmptyTypeAndFormatDiffs(typeDiff, schemaDiff, formatDiff)
-								result = append(result, BackwardCompatibilityError{
+								result = append(result, CheckResult{
 									Id:          "response-property-type-changed",
 									Level:       ERR,
 									Text:        fmt.Sprintf(config.i18n("response-property-type-changed"), empty2none(typeDiff.From), empty2none(formatDiff.From), empty2none(typeDiff.To), empty2none(formatDiff.To), ColorizedValue(responseStatus)),

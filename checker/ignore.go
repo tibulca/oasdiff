@@ -8,8 +8,8 @@ import (
 	"github.com/TwiN/go-color"
 )
 
-func ProcessIgnoredBackwardCompatibilityErrors(level int, errs []BackwardCompatibilityError, ignoreFile string) ([]BackwardCompatibilityError, error) {
-	result := make([]BackwardCompatibilityError, 0)
+func ProcessIgnoredBackwardCompatibilityErrors(level int, errs []CheckResult, ignoreFile string) ([]CheckResult, error) {
+	result := make([]CheckResult, 0)
 
 	ignore, err := os.Open(ignoreFile)
 	if err != nil {

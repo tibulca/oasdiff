@@ -6,8 +6,8 @@ import (
 	"github.com/tufin/oasdiff/diff"
 )
 
-func NewRequiredRequestNonPathParameterCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []BackwardCompatibilityError {
-	result := make([]BackwardCompatibilityError, 0)
+func NewRequiredRequestNonPathParameterCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []CheckResult {
+	result := make([]CheckResult, 0)
 	if diffReport.PathsDiff == nil {
 		return result
 	}
@@ -30,7 +30,7 @@ func NewRequiredRequestNonPathParameterCheck(diffReport *diff.Diff, operationsSo
 						if param.Value.Name == paramName {
 							if param.Value.Required {
 								source := (*operationsSources)[operationItem.Revision]
-								result = append(result, BackwardCompatibilityError{
+								result = append(result, CheckResult{
 									Id:          "new-required-request-parameter",
 									Level:       ERR,
 									Text:        fmt.Sprintf(config.i18n("new-required-request-parameter"), ColorizedValue(paramLocation), ColorizedValue(paramName)),

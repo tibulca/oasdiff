@@ -8,8 +8,8 @@ import (
 
 const responseMediatypeEnumValueRemovedId = "response-mediatype-enum-value-removed"
 
-func ResponseMediaTypeEnumValueRemovedCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []BackwardCompatibilityError {
-	result := make([]BackwardCompatibilityError, 0)
+func ResponseMediaTypeEnumValueRemovedCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []CheckResult {
+	result := make([]CheckResult, 0)
 	if diffReport.PathsDiff == nil {
 		return result
 	}
@@ -44,7 +44,7 @@ func ResponseMediaTypeEnumValueRemovedCheck(diffReport *diff.Diff, operationsSou
 					}
 
 					for _, enumVal := range enumDiff.Deleted {
-						result = append(result, BackwardCompatibilityError{
+						result = append(result, CheckResult{
 							Id:          responseMediatypeEnumValueRemovedId,
 							Level:       ERR,
 							Text:        fmt.Sprintf(config.i18n(responseMediatypeEnumValueRemovedId), mediaType, ColorizedValue(enumVal)),

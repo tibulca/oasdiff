@@ -6,8 +6,8 @@ import (
 	"github.com/tufin/oasdiff/diff"
 )
 
-func RequestParameterMaxSetCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []BackwardCompatibilityError {
-	result := make([]BackwardCompatibilityError, 0)
+func RequestParameterMaxSetCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []CheckResult {
+	result := make([]CheckResult, 0)
 	if diffReport.PathsDiff == nil {
 		return result
 	}
@@ -35,7 +35,7 @@ func RequestParameterMaxSetCheck(diffReport *diff.Diff, operationsSources *diff.
 
 					source := (*operationsSources)[operationItem.Revision]
 
-					result = append(result, BackwardCompatibilityError{
+					result = append(result, CheckResult{
 						Id:          "request-parameter-max-set",
 						Level:       WARN,
 						Text:        fmt.Sprintf(config.i18n("request-parameter-max-set"), ColorizedValue(paramLocation), ColorizedValue(paramName), ColorizedValue(maxDiff.To)),

@@ -6,8 +6,8 @@ import (
 	"github.com/tufin/oasdiff/diff"
 )
 
-func NewRequestPathParameterCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []BackwardCompatibilityError {
-	result := make([]BackwardCompatibilityError, 0)
+func NewRequestPathParameterCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []CheckResult {
+	result := make([]CheckResult, 0)
 	if diffReport.PathsDiff == nil {
 		return result
 	}
@@ -26,7 +26,7 @@ func NewRequestPathParameterCheck(diffReport *diff.Diff, operationsSources *diff
 
 				for _, paramName := range paramItems {
 					source := (*operationsSources)[operationItem.Revision]
-					result = append(result, BackwardCompatibilityError{
+					result = append(result, CheckResult{
 						Id:          "new-request-path-parameter",
 						Level:       ERR,
 						Text:        fmt.Sprintf(config.i18n("new-request-path-parameter"), ColorizedValue(paramName)),

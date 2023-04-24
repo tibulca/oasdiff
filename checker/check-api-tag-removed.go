@@ -10,8 +10,8 @@ const (
 	apiTagRemovedCheckId = "api-tag-removed"
 )
 
-func APITagRemovedCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []BackwardCompatibilityError {
-	result := make([]BackwardCompatibilityError, 0)
+func APITagRemovedCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []CheckResult {
+	result := make([]CheckResult, 0)
 	if diffReport.PathsDiff == nil {
 		return result
 	}
@@ -30,7 +30,7 @@ func APITagRemovedCheck(diffReport *diff.Diff, operationsSources *diff.Operation
 			}
 
 			for _, tag := range operationItem.TagsDiff.Deleted {
-				result = append(result, BackwardCompatibilityError{
+				result = append(result, CheckResult{
 					Id:          apiTagRemovedCheckId,
 					Level:       ERR,
 					Text:        fmt.Sprintf(config.i18n(apiTagRemovedCheckId), ColorizedValue(tag)),

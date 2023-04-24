@@ -6,8 +6,8 @@ import (
 	"github.com/tufin/oasdiff/diff"
 )
 
-func RequestPropertyMinIncreasedCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []BackwardCompatibilityError {
-	result := make([]BackwardCompatibilityError, 0)
+func RequestPropertyMinIncreasedCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []CheckResult {
+	result := make([]CheckResult, 0)
 	if diffReport.PathsDiff == nil {
 		return result
 	}
@@ -30,7 +30,7 @@ func RequestPropertyMinIncreasedCheck(diffReport *diff.Diff, operationsSources *
 					if minDiff.From != nil &&
 						minDiff.To != nil {
 						if IsIncreasedValue(minDiff) {
-							result = append(result, BackwardCompatibilityError{
+							result = append(result, CheckResult{
 								Id:          "request-body-min-increased",
 								Level:       ERR,
 								Text:        fmt.Sprintf(config.i18n("request-body-min-increased"), ColorizedValue(minDiff.To)),
@@ -61,7 +61,7 @@ func RequestPropertyMinIncreasedCheck(diffReport *diff.Diff, operationsSources *
 							return
 						}
 
-						result = append(result, BackwardCompatibilityError{
+						result = append(result, CheckResult{
 							Id:          "request-property-min-increased",
 							Level:       ERR,
 							Text:        fmt.Sprintf(config.i18n("request-property-min-increased"), ColorizedValue(propertyFullName(propertyPath, propertyName)), ColorizedValue(minDiff.To)),

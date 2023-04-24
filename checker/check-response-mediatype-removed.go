@@ -6,8 +6,8 @@ import (
 	"github.com/tufin/oasdiff/diff"
 )
 
-func ResponseMediaTypeRemoved(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []BackwardCompatibilityError {
-	result := make([]BackwardCompatibilityError, 0)
+func ResponseMediaTypeRemoved(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []CheckResult {
+	result := make([]CheckResult, 0)
 	if diffReport.PathsDiff == nil {
 		return result
 	}
@@ -31,7 +31,7 @@ func ResponseMediaTypeRemoved(diffReport *diff.Diff, operationsSources *diff.Ope
 					continue
 				}
 				for _, mediaType := range responsesDiff.ContentDiff.MediaTypeDeleted {
-					result = append(result, BackwardCompatibilityError{
+					result = append(result, CheckResult{
 						Id:          "response-media-type-removed",
 						Level:       ERR,
 						Text:        fmt.Sprintf(config.i18n("response-media-type-removed"), ColorizedValue(mediaType), ColorizedValue(responseStatus)),
