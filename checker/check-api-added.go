@@ -15,12 +15,13 @@ func APIAddedCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSour
 			op := diffReport.PathsDiff.Revision[path].Operations()[operation]
 			source := (*operationsSources)[op]
 			result = append(result, BackwardCompatibilityError{
-				Id:        "api-path-added",
-				Level:     INFO,
-				Text:      config.i18n("api-path-added"),
-				Operation: operation,
-				Path:      path,
-				Source:    source,
+				Id:          "api-path-added",
+				Level:       INFO,
+				Text:        config.i18n("api-path-added"),
+				Operation:   operation,
+				OperationId: op.OperationID,
+				Path:        path,
+				Source:      source,
 			})
 		}
 	}

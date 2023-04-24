@@ -26,12 +26,13 @@ func APIDeprecatedCheck(diffReport *diff.Diff, operationsSources *diff.Operation
 			}
 
 			result = append(result, BackwardCompatibilityError{
-				Id:        id,
-				Level:     INFO,
-				Text:      config.i18n(id),
-				Operation: operation,
-				Path:      path,
-				Source:    source,
+				Id:          id,
+				Level:       INFO,
+				Text:        config.i18n(id),
+				Operation:   operation,
+				OperationId: op.OperationID,
+				Path:        path,
+				Source:      source,
 			})
 
 		}
