@@ -50,7 +50,7 @@ func Format(format string, profile string, diffReport *diff.Diff, operationsSour
 	case SummaryProfile:
 		outputProfile = summaryProfile{}
 	case ChangelogProfile:
-		outputProfile = changelogProfile{}
+		outputProfile = &changelogProfile{}
 	default:
 		return nil, unknownFormatErrCode, fmt.Errorf("unknown output profile %s", profile)
 	}
