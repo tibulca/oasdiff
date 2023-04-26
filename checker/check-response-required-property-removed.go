@@ -8,8 +8,8 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-func ResponseRequiredPropertyRemovedCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []CheckResult {
-	result := make([]CheckResult, 0)
+func ResponseRequiredPropertyRemovedCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []BackwardCompatibilityError {
+	result := make([]BackwardCompatibilityError, 0)
 	if diffReport.PathsDiff == nil {
 		return result
 	}
@@ -41,7 +41,7 @@ func ResponseRequiredPropertyRemovedCheck(diffReport *diff.Diff, operationsSourc
 							if !slices.Contains(parent.Base.Value.Required, propertyName) {
 								return
 							}
-							result = append(result, CheckResult{
+							result = append(result, BackwardCompatibilityError{
 								Id:          "response-required-property-removed",
 								Level:       ERR,
 								Text:        fmt.Sprintf(config.i18n("response-required-property-removed"), ColorizedValue(propertyFullName(propertyPath, propertyName)), ColorizedValue(responseStatus)),

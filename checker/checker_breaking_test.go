@@ -26,7 +26,7 @@ func l(t *testing.T, v int) load.OpenAPISpecInfo {
 	return load.OpenAPISpecInfo{Spec: oas, Url: fmt.Sprintf("../data/openapi-test%d.yaml", v)}
 }
 
-func d(t *testing.T, config *diff.Config, v1, v2 int) []checker.CheckResult {
+func d(t *testing.T, config *diff.Config, v1, v2 int) []checker.BackwardCompatibilityError {
 	t.Helper()
 	l1 := l(t, v1)
 	l2 := l(t, v2)

@@ -6,8 +6,8 @@ import (
 	"github.com/tufin/oasdiff/diff"
 )
 
-func ResponseHeaderBecameOptional(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []CheckResult {
-	result := make([]CheckResult, 0)
+func ResponseHeaderBecameOptional(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []BackwardCompatibilityError {
+	result := make([]BackwardCompatibilityError, 0)
 	if diffReport.PathsDiff == nil {
 		return result
 	}
@@ -37,7 +37,7 @@ func ResponseHeaderBecameOptional(diffReport *diff.Diff, operationsSources *diff
 						continue
 					}
 
-					result = append(result, CheckResult{
+					result = append(result, BackwardCompatibilityError{
 						Id:          "response-header-became-optional",
 						Level:       ERR,
 						Text:        fmt.Sprintf(config.i18n("response-header-became-optional"), ColorizedValue(headerName), ColorizedValue(responseStatus)),

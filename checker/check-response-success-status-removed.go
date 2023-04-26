@@ -7,7 +7,7 @@ import (
 	"github.com/tufin/oasdiff/diff"
 )
 
-func ResponseSuccessStatusRemoved(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []CheckResult {
+func ResponseSuccessStatusRemoved(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []BackwardCompatibilityError {
 	success := func(status int) bool {
 		return status >= 200 && status <= 299
 	}
@@ -15,7 +15,7 @@ func ResponseSuccessStatusRemoved(diffReport *diff.Diff, operationsSources *diff
 	return ResponseSuccessRemoved(diffReport, operationsSources, config, success, "response-success-status-removed")
 }
 
-func ResponseNonSuccessStatusRemoved(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []CheckResult {
+func ResponseNonSuccessStatusRemoved(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []BackwardCompatibilityError {
 	notSuccess := func(status int) bool {
 		return status < 200 || status > 299
 	}
@@ -23,8 +23,8 @@ func ResponseNonSuccessStatusRemoved(diffReport *diff.Diff, operationsSources *d
 	return ResponseSuccessRemoved(diffReport, operationsSources, config, notSuccess, "response-non-success-status-removed")
 }
 
-func ResponseSuccessRemoved(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig, filter func(int) bool, id string) []CheckResult {
-	result := make([]CheckResult, 0)
+func ResponseSuccessRemoved(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig, filter func(int) bool, id string) []BackwardCompatibilityError {
+	result := make([]BackwardCompatibilityError, 0)
 	if diffReport.PathsDiff == nil {
 		return result
 	}
@@ -47,7 +47,7 @@ func ResponseSuccessRemoved(diffReport *diff.Diff, operationsSources *diff.Opera
 				}
 
 				if filter(status) {
-					result = append(result, CheckResult{
+					result = append(result, BackwardCompatibilityError{
 						Id:          id,
 						Level:       ERR,
 						Text:        fmt.Sprintf(config.i18n(id), ColorizedValue(responseStatus)),

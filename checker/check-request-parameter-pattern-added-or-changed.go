@@ -6,8 +6,8 @@ import (
 	"github.com/tufin/oasdiff/diff"
 )
 
-func RequestParameterPatternAddedOrChangedCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []CheckResult {
-	result := make([]CheckResult, 0)
+func RequestParameterPatternAddedOrChangedCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []BackwardCompatibilityError {
+	result := make([]BackwardCompatibilityError, 0)
 	if diffReport.PathsDiff == nil {
 		return result
 	}
@@ -39,7 +39,7 @@ func RequestParameterPatternAddedOrChangedCheck(diffReport *diff.Diff, operation
 					source := (*operationsSources)[operationItem.Revision]
 
 					if patternDiff.From == "" {
-						result = append(result, CheckResult{
+						result = append(result, BackwardCompatibilityError{
 							Id:          "request-parameter-pattern-added",
 							Level:       WARN,
 							Text:        fmt.Sprintf(config.i18n("request-parameter-pattern-added"), patternDiff.To, ColorizedValue(paramLocation), ColorizedValue(paramName)),
@@ -50,7 +50,7 @@ func RequestParameterPatternAddedOrChangedCheck(diffReport *diff.Diff, operation
 							Source:      source,
 						})
 					} else {
-						result = append(result, CheckResult{
+						result = append(result, BackwardCompatibilityError{
 							Id:          "request-parameter-pattern-changed",
 							Level:       WARN,
 							Text:        fmt.Sprintf(config.i18n("request-parameter-pattern-changed"), ColorizedValue(paramLocation), ColorizedValue(paramName), patternDiff.From, patternDiff.To),

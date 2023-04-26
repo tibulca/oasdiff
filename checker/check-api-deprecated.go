@@ -4,8 +4,8 @@ import (
 	"github.com/tufin/oasdiff/diff"
 )
 
-func APIDeprecatedCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []CheckResult {
-	result := make([]CheckResult, 0)
+func APIDeprecatedCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []BackwardCompatibilityError {
+	result := make([]BackwardCompatibilityError, 0)
 	if diffReport.PathsDiff == nil {
 		return result
 	}
@@ -25,7 +25,7 @@ func APIDeprecatedCheck(diffReport *diff.Diff, operationsSources *diff.Operation
 				id = "api-path-reactivated"
 			}
 
-			result = append(result, CheckResult{
+			result = append(result, BackwardCompatibilityError{
 				Id:          id,
 				Level:       INFO,
 				Text:        config.i18n(id),

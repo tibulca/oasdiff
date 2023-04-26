@@ -25,7 +25,7 @@ const (
 	XExtensibleEnumExtension = "x-extensible-enum"
 )
 
-type CheckResult struct {
+type BackwardCompatibilityError struct {
 	Id          string `json:"id,omitempty" yaml:"id,omitempty"`
 	Text        string `json:"text,omitempty" yaml:"text,omitempty"`
 	Comment     string `json:"comment,omitempty" yaml:"comment,omitempty"`
@@ -36,7 +36,7 @@ type CheckResult struct {
 	Source      string `json:"source,omitempty" yaml:"source,omitempty"`
 }
 
-type BackwardCompatibilityErrors []CheckResult
+type BackwardCompatibilityErrors []BackwardCompatibilityError
 
 func (bcErrors BackwardCompatibilityErrors) Len() int {
 	return len(bcErrors)
@@ -51,9 +51,9 @@ func (bcErrors BackwardCompatibilityErrors) Swap(i, j int) {
 	bcErrors[i], bcErrors[j] = bcErrors[j], bcErrors[i]
 }
 
-type BackwardCompatibilityCheck func(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []CheckResult
+type BackwardCompatibilityCheck func(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []BackwardCompatibilityError
 
-func (r *CheckResult) Error() string {
+func (r *BackwardCompatibilityError) Error() string {
 	var levelName string
 	switch r.Level {
 	case ERR:
@@ -66,7 +66,7 @@ func (r *CheckResult) Error() string {
 	return fmt.Sprintf("%s at %s, in API %s %s %s [%s]. %s", levelName, r.Source, r.Operation, r.Path, r.Text, r.Id, r.Comment)
 }
 
-func (r *CheckResult) LocalizedError(l localizations.Localizer) string {
+func (r *BackwardCompatibilityError) LocalizedError(l localizations.Localizer) string {
 	var levelName string
 	switch r.Level {
 	case ERR:
@@ -91,7 +91,7 @@ func IsPipedOutput() bool {
 	return *pipedOutput
 }
 
-func (r *CheckResult) PrettyErrorText(l localizations.Localizer) string {
+func (r *BackwardCompatibilityError) PrettyErrorText(l localizations.Localizer) string {
 	if IsPipedOutput() {
 		return r.LocalizedError(l)
 	}
@@ -141,7 +141,7 @@ func CheckBackwardCompatibility(config BackwardCompatibilityCheckConfig, diffRep
 	return result
 }
 
-func removeDraftAndAlphaOperationsDiffs(diffReport *diff.Diff, result []CheckResult, operationsSources *diff.OperationsSourcesMap) []CheckResult {
+func removeDraftAndAlphaOperationsDiffs(diffReport *diff.Diff, result []BackwardCompatibilityError, operationsSources *diff.OperationsSourcesMap) []BackwardCompatibilityError {
 	if diffReport.PathsDiff == nil {
 		return result
 	}
@@ -196,7 +196,7 @@ func removeDraftAndAlphaOperationsDiffs(diffReport *diff.Diff, result []CheckRes
 			baseStability, err := getStabilityLevel(pathDiff.Base.Operations()[operation].Extensions)
 			if err != nil {
 				source := (*operationsSources)[pathDiff.Base.Operations()[operation]]
-				result = append(result, CheckResult{
+				result = append(result, BackwardCompatibilityError{
 					Id:          "parsing-error",
 					Level:       ERR,
 					Text:        fmt.Sprintf("parsing error %s", err.Error()),
@@ -210,7 +210,7 @@ func removeDraftAndAlphaOperationsDiffs(diffReport *diff.Diff, result []CheckRes
 			revisionStability, err := getStabilityLevel(pathDiff.Revision.Operations()[operation].Extensions)
 			if err != nil {
 				source := (*operationsSources)[pathDiff.Revision.Operations()[operation]]
-				result = append(result, CheckResult{
+				result = append(result, BackwardCompatibilityError{
 					Id:          "parsing-error",
 					Level:       ERR,
 					Text:        fmt.Sprintf("parsing error %s", err.Error()),
@@ -226,7 +226,7 @@ func removeDraftAndAlphaOperationsDiffs(diffReport *diff.Diff, result []CheckRes
 				baseStability == "beta" && revisionStability != "beta" && revisionStability != "stable" ||
 				baseStability == "alpha" && revisionStability != "alpha" && revisionStability != "beta" && revisionStability != "stable" ||
 				revisionStability == "" && baseStability != "" {
-				result = append(result, CheckResult{
+				result = append(result, BackwardCompatibilityError{
 					Id:          "api-stability-decreased",
 					Level:       ERR,
 					Text:        fmt.Sprintf("stability level decreased from '%s' to '%s'", baseStability, revisionStability),
@@ -245,13 +245,13 @@ func removeDraftAndAlphaOperationsDiffs(diffReport *diff.Diff, result []CheckRes
 	return result
 }
 
-func newParsingError(result []CheckResult,
+func newParsingError(result []BackwardCompatibilityError,
 	err error,
 	operation string,
 	operationItem *openapi3.Operation,
 	path string,
-	source string) []CheckResult {
-	result = append(result, CheckResult{
+	source string) []BackwardCompatibilityError {
+	result = append(result, BackwardCompatibilityError{
 		Id:          "parsing-error",
 		Level:       ERR,
 		Text:        fmt.Sprintf("parsing error %s", err.Error()),

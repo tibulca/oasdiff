@@ -6,8 +6,8 @@ import (
 	"github.com/tufin/oasdiff/diff"
 )
 
-func RequestParameterEnumValueRemovedCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []CheckResult {
-	result := make([]CheckResult, 0)
+func RequestParameterEnumValueRemovedCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []BackwardCompatibilityError {
+	result := make([]BackwardCompatibilityError, 0)
 	if diffReport.PathsDiff == nil {
 		return result
 	}
@@ -33,7 +33,7 @@ func RequestParameterEnumValueRemovedCheck(diffReport *diff.Diff, operationsSour
 						continue
 					}
 					for _, enumVal := range enumDiff.Deleted {
-						result = append(result, CheckResult{
+						result = append(result, BackwardCompatibilityError{
 							Id:          "request-parameter-enum-value-removed",
 							Level:       ERR,
 							Text:        fmt.Sprintf(config.i18n("request-parameter-enum-value-removed"), enumVal, ColorizedValue(paramLocation), ColorizedValue(paramName)),

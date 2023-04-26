@@ -8,8 +8,8 @@ import (
 	"github.com/tufin/oasdiff/diff"
 )
 
-func APIDeprecationCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []CheckResult {
-	result := make([]CheckResult, 0)
+func APIDeprecationCheck(diffReport *diff.Diff, operationsSources *diff.OperationsSourcesMap, config BackwardCompatibilityCheckConfig) []BackwardCompatibilityError {
+	result := make([]BackwardCompatibilityError, 0)
 	if diffReport.PathsDiff == nil {
 		return result
 	}
@@ -32,7 +32,7 @@ func APIDeprecationCheck(diffReport *diff.Diff, operationsSources *diff.Operatio
 
 			date, err := diff.GetSunsetDate(op.Extensions)
 			if err != nil {
-				result = append(result, CheckResult{
+				result = append(result, BackwardCompatibilityError{
 					Id:          "api-deprecated-sunset-parse",
 					Level:       ERR,
 					Text:        config.i18n("api-deprecated-sunset-parse"),
@@ -49,7 +49,7 @@ func APIDeprecationCheck(diffReport *diff.Diff, operationsSources *diff.Operatio
 
 			stability, err := getStabilityLevel(op.Extensions)
 			if err != nil {
-				result = append(result, CheckResult{
+				result = append(result, BackwardCompatibilityError{
 					Id:          "parsing-error",
 					Level:       ERR,
 					Text:        fmt.Sprintf("parsing error %s", err.Error()),
@@ -65,7 +65,7 @@ func APIDeprecationCheck(diffReport *diff.Diff, operationsSources *diff.Operatio
 			}
 
 			if days < deprecationDays {
-				result = append(result, CheckResult{
+				result = append(result, BackwardCompatibilityError{
 					Id:          "api-sunset-date-too-small",
 					Level:       ERR,
 					Text:        fmt.Sprintf(config.i18n("api-sunset-date-too-small"), date, deprecationDays),
